@@ -1,0 +1,60 @@
+// This is your Prisma schema file,
+// learn more about it in the docs: https://pris.ly/d/prisma-schema
+
+// Get a free hosted Postgres database in seconds: `npx create-db`
+
+generator client {
+  provider = "prisma-client"
+  output   = "../generated/prisma"
+}
+
+datasource db {
+  provider = "postgresql"
+}
+
+model User {
+  id        Int      @id @default(autoincrement())
+  email     String   @unique
+  name      String?
+  username  String   @unique
+  followers Follower[] 
+  following Following[]
+  events    Event[]
+  location Location? @relation(fields: [locationId], references: [id])
+}
+
+model Follower {
+  id        Int      @id @default(autoincrement())
+  userId    Int
+  followerId Int
+  createdAt DateTime @default(now())
+  user      User     @relation(fields: [userId], references: [id])
+  follower  User     @relation(fields: [followerId], references: [id])
+}
+
+model Following {
+  id        Int      @id @default(autoincrement())
+  userId    Int
+  followingId Int
+  createdAt DateTime @default(now())
+  user      User     @relation(fields: [userId], references: [id])
+  following User     @relation(fields: [followingId], references: [id])
+}
+
+model Event {
+  id          Int      @id @default(autoincrement())
+  title       String
+  description String?
+  date        DateTime
+  location    Location? @relation(fields: [locationId], references: [id])
+  locationId  Int?
+}
+
+model Post {
+  id        Int      @id @default(autoincrement())
+  title     String
+  content   String?
+  published Boolean  @default(false)
+  author    User     @relation(fields: [authorId], references: [id])
+  authorId  Int
+}
