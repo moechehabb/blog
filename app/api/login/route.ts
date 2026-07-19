@@ -1,7 +1,7 @@
 import prisma from "@/lib/prisma";
 import { redirect } from "next/navigation";
 
-export default async function POST(req: Request) {
+export async function POST(req: Request) {
     const body = await req.json();
 
     if(!body.email) {
@@ -10,7 +10,7 @@ export default async function POST(req: Request) {
         });
     }
 
-    const userExists = prisma.user.findMany({
+    const userExists = await prisma.user.findUnique({
         where: {
             email: body.email
         }
