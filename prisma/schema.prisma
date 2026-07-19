@@ -23,8 +23,19 @@ model User {
   posts      Post[]
   location   Location? @relation(fields: [locationId], references: [id])
   locationId Int?
+  sessions   Session[]
 
   @@index([locationId])
+}
+
+model Session {
+  id        String   @id
+  userId    Int
+  expiresAt DateTime
+  createdAt DateTime @default(now())
+  user      User     @relation(fields: [userId], references: [id])
+
+  @@index([userId])
 }
 
 // One row per follow edge: follower -> following
@@ -57,16 +68,35 @@ model Post {
   id        Int     @id @default(autoincrement())
   title     String
   content   String?
+  images    String[] @default([])
   published Boolean @default(false)
   author    User    @relation(fields: [authorId], references: [id])
   authorId  Int
+  location   Location? @relation(fields: [locationId], references: [id])
+  locationId Int?
 
   @@index([authorId])
+  @@index([locationId])
+}
+
+model Otp {
+  id        Int      @id @default(autoincrement())
+  email     String
+  codeHash  String
+  expiresAt DateTime
+  attempts  Int      @default(0)
+  createdAt DateTime @default(now())
+
+  @@index([email])
 }
 
 model Location {
   id      Int     @id @default(autoincrement())
   address String
+  placeId String? @unique
+  lat     Float?
+  lng     Float?
   users   User[]
   events  Event[]
+  posts   Post[]
 }
